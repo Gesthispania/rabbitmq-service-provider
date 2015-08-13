@@ -35,12 +35,12 @@ class RabbitServiceProvider implements ServiceProviderInterface
 
     /**
      * Return the name of the connection to use.
-     * 
+     *
      * @param  array     $options     Options for the Producer or Consumer.
      * @param  array     $connections Connections defined in the config file.
      * @return string                 The connection name that will be used
      */
-    private function getConnection($app, $options, $connections)
+    public function getConnection($app, $options, $connections)
     {
         $connection_name = @$options['connection']?: self::DEFAULT_CONNECTION;
 
@@ -77,14 +77,15 @@ class RabbitServiceProvider implements ServiceProviderInterface
 
     private function loadProducers($app)
     {
-        $app['rabbit.producer'] = $app->share(function ($app) {
+        $_this = $this;
+        $app['rabbit.producer'] = $app->share(function ($app) use ($_this) {
             if (!isset($app['rabbit.producers'])) {
                 return;
             }
 
             $producers = array();
             foreach ($app['rabbit.producers'] as $name => $options) {
-                $connection = $this->getConnection($app, $options, $app['rabbit.connections']);
+                $connection = $_this->getConnection($app, $options, $app['rabbit.connections']);
 
                 $producer = new Producer($connection);
                 $producer->setExchangeOptions($options['exchange_options']);
@@ -102,14 +103,15 @@ class RabbitServiceProvider implements ServiceProviderInterface
 
     private function loadConsumers($app)
     {
-        $app['rabbit.consumer'] = $app->share(function ($app) {
+        $_this = $this;
+        $app['rabbit.consumer'] = $app->share(function ($app) use ($_this) {
             if (!isset($app['rabbit.consumers'])) {
                 return;
             }
 
             $consumers = array();
             foreach ($app['rabbit.consumers'] as $name => $options) {
-                $connection = $this->getConnection($app, $options, $app['rabbit.connections']);
+                $connection = $_this->getConnection($app, $options, $app['rabbit.connections']);
                 $consumer = new Consumer($connection);
                 $consumer->setExchangeOptions($options['exchange_options']);
                 $consumer->setQueueOptions($options['queue_options']);
@@ -140,14 +142,15 @@ class RabbitServiceProvider implements ServiceProviderInterface
 
     private function loadAnonymousConsumers($app)
     {
-        $app['rabbit.anonymous_consumer'] = $app->share(function ($app) {
+        $_this = $this;
+        $app['rabbit.anonymous_consumer'] = $app->share(function ($app) use ($_this) {
             if (!isset($app['rabbit.anon_consumers'])) {
                 return;
             }
 
             $consumers = array();
             foreach ($app['rabbit.anon_consumers'] as $name => $options) {
-                $connection = $this->getConnection($app, $options, $app['rabbit.connections']);
+                $connection = $_this->getConnection($app, $options, $app['rabbit.connections']);
                 $consumer = new AnonConsumer($connection);
                 $consumer->setExchangeOptions($options['exchange_options']);
                 $consumer->setCallback(array($options['callback'], 'execute'));
@@ -161,14 +164,15 @@ class RabbitServiceProvider implements ServiceProviderInterface
 
     private function loadMultipleConsumers($app)
     {
-        $app['rabbit.multiple_consumer'] = $app->share(function ($app) {
+        $_this = $this;
+        $app['rabbit.multiple_consumer'] = $app->share(function ($app) use ($_this) {
             if (!isset($app['rabbit.multiple_consumers'])) {
                 return;
             }
 
             $consumers = array();
             foreach ($app['rabbit.multiple_consumers'] as $name => $options) {
-                $connection = $this->getConnection($app, $options, $app['rabbit.connections']);
+                $connection = $_this->getConnection($app, $options, $app['rabbit.connections']);
                 $consumer = new MultipleConsumer($connection);
                 $consumer->setExchangeOptions($options['exchange_options']);
                 $consumer->setQueues($options['queues']);
@@ -194,19 +198,20 @@ class RabbitServiceProvider implements ServiceProviderInterface
 
             return $consumers;
         });
-        
+
     }
 
     private function loadRpcClients($app)
     {
-        $app['rabbit.rpc_client'] = $app->share(function ($app) {
+        $_this = $this;
+        $app['rabbit.rpc_client'] = $app->share(function ($app) use ($_this) {
             if (!isset($app['rabbit.rpc_clients'])) {
                 return;
             }
 
             $clients = array();
             foreach ($app['rabbit.rpc_clients'] as $name => $options) {
-                $connection = $this->getConnection($app, $options, $app['rabbit.connections']);
+                $connection = $_this->getConnection($app, $options, $app['rabbit.connections']);
                 $client = new RpcClient($connection);
 
                 if (array_key_exists('expect_serialized_response', $options)) {
@@ -222,14 +227,15 @@ class RabbitServiceProvider implements ServiceProviderInterface
 
     private function loadRpcServers($app)
     {
-        $app['rabbit.rpc_server'] = $app->share(function ($app) {
+        $_this = $this;
+        $app['rabbit.rpc_server'] = $app->share(function ($app) use ($_this) {
             if (!isset($app['rabbit.rpc_servers'])) {
                 return;
             }
 
             $servers = array();
             foreach ($app['rabbit.rpc_servers'] as $name => $options) {
-                $connection = $this->getConnection($app, $options, $app['rabbit.connections']);
+                $connection = $_this->getConnection($app, $options, $app['rabbit.connections']);
                 $server = new RpcServer($connection);
                 $server->initServer($name);
                 $server->setCallback(array($options['callback'], 'execute'));
@@ -247,6 +253,6 @@ class RabbitServiceProvider implements ServiceProviderInterface
 
             return $servers;
         });
-        
+
     }
 }
