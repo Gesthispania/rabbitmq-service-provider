@@ -58,7 +58,7 @@ class RabbitServiceProvider implements ServiceProviderInterface
                 throw new \InvalidArgumentException('You need to specify at least a connection in your configuration.');
             }
 
-            $connections = [];
+            $connections = array();
             foreach ($app['rabbit.connections'] as $name => $options) {
                 $connection = new AMQPLazyConnection(
                     $app['rabbit.connections'][$name]['host'],
@@ -82,7 +82,7 @@ class RabbitServiceProvider implements ServiceProviderInterface
                 return;
             }
 
-            $producers = [];
+            $producers = array();
             foreach ($app['rabbit.producers'] as $name => $options) {
                 $connection = $this->getConnection($app, $options, $app['rabbit.connections']);
 
@@ -107,7 +107,7 @@ class RabbitServiceProvider implements ServiceProviderInterface
                 return;
             }
 
-            $consumers = [];
+            $consumers = array();
             foreach ($app['rabbit.consumers'] as $name => $options) {
                 $connection = $this->getConnection($app, $options, $app['rabbit.connections']);
                 $consumer = new Consumer($connection);
@@ -145,7 +145,7 @@ class RabbitServiceProvider implements ServiceProviderInterface
                 return;
             }
 
-            $consumers = [];
+            $consumers = array();
             foreach ($app['rabbit.anon_consumers'] as $name => $options) {
                 $connection = $this->getConnection($app, $options, $app['rabbit.connections']);
                 $consumer = new AnonConsumer($connection);
@@ -166,7 +166,7 @@ class RabbitServiceProvider implements ServiceProviderInterface
                 return;
             }
 
-            $consumers = [];
+            $consumers = array();
             foreach ($app['rabbit.multiple_consumers'] as $name => $options) {
                 $connection = $this->getConnection($app, $options, $app['rabbit.connections']);
                 $consumer = new MultipleConsumer($connection);
@@ -204,7 +204,7 @@ class RabbitServiceProvider implements ServiceProviderInterface
                 return;
             }
 
-            $clients = [];
+            $clients = array();
             foreach ($app['rabbit.rpc_clients'] as $name => $options) {
                 $connection = $this->getConnection($app, $options, $app['rabbit.connections']);
                 $client = new RpcClient($connection);
@@ -227,7 +227,7 @@ class RabbitServiceProvider implements ServiceProviderInterface
                 return;
             }
 
-            $servers = [];
+            $servers = array();
             foreach ($app['rabbit.rpc_servers'] as $name => $options) {
                 $connection = $this->getConnection($app, $options, $app['rabbit.connections']);
                 $server = new RpcServer($connection);
